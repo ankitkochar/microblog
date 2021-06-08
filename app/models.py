@@ -20,16 +20,17 @@ class User(UserMixin,db.Model):
 	posts = db.relationship('Post', backref='author', lazy='dynamic')
 	about_me = db.Column(db.String(140))
 	last_seen = db.Column(db.DateTime, default=datetime.utcnow)
-
-	like = db.relationship(
-		"Postlike", foreign_keys="Postlike.user_id",
-		backref="user", lazy="dynamic"
-		)
+	comments = db.relationship("PostComment", foreign_keys="PostComment.user_id", backref="user",lazy="dynamic")
+	like = db.relationship("Postlike", foreign_keys="Postlike.user_id",backref="user", lazy="dynamic")
 
 	def like_post(self,post):
 		if not self.has_liked_post(post):
 			liked = Postlike(user_id=self.id,post_id=post.id)
 			db.session.add(liked)
+
+	def comment_post(self,post,body):
+		commented = PostComment(user_id=self.id,post_id=post.id,body=body)
+		db.session.add(commented)
 
 	def unlike_post(self,post):
 		if self.has_liked_post(post):
@@ -38,10 +39,19 @@ class User(UserMixin,db.Model):
 				post_id=post.id
 				).delete()
 
+	def uncomment_post(self,post):
+		if self.has_commented_post(post):
+			PostComment.query.filter(user_id=self.id,post_id=post_id).delete()
+
 	def has_liked_post(self,post):
 		return Postlike.query.filter(
 			Postlike.user_id==self.id,
 			Postlike.post_id==post.id).count()>0
+
+	def has_commented_post(self,post):
+		return PostComment.query.filter(
+			PostComment.user_id==self.id,
+			PostComment.post_id==post.id).count()>0
 
 	followed = db.relationship(
 		'User', secondary=followers,
@@ -102,6 +112,12 @@ class Post(db.Model):
 	timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 	likes = db.relationship("Postlike", backref="post",lazy="dynamic")
+	comments = db.relationship("PostComment", backref="post",lazy="dynamic")
+	
+	# def get_comments(self):
+	# 	comments = PostComment.query.filter(post_id==self.id)
+	# 	return comments.order_by(Post.timestamp.desc())
+
 
 	def __repr__(self):
 		return '<Post {}>'.format(self.body)
@@ -111,6 +127,12 @@ class Postlike(db.Model):
 	user_id = db.Column(db.Integer,db.ForeignKey("user.id"))
 	post_id = db.Column(db.Integer,db.ForeignKey("post.id"))
 		
+class PostComment(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	user_id = db.Column(db.Integer,db.ForeignKey("user.id"))
+	post_id = db.Column(db.Integer,db.ForeignKey("post.id"))
+	body = db.Column(db.String(140))
+	timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
 @login.user_loader
 def load_user(id):

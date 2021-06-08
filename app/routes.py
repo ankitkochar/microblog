@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, ResetPasswordRequestForm, ResetPasswordForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, ResetPasswordRequestForm, ResetPasswordForm, CommentForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Post
 from werkzeug.urls import url_parse
@@ -179,9 +179,7 @@ def reset_password(token):
 	if current_user.is_authenticated:
 		return redirect(url_for('index'))
 	user = User.verify_reset_password_token(token)
-	print("ankit is acha bacha")
 	if not user:
-		print("ankit")
 		return redirect(url_for('index'))
 	form = ResetPasswordForm()
 	if form.validate_on_submit():
@@ -203,3 +201,15 @@ def like_action(post_id,action):
 		db.session.commit()
 	return redirect(request.referrer)
 
+@app.route("/post/<int:post_id>/comment", methods=["GET","POST"])
+@login_required
+def comment(post_id):
+	form = CommentForm()
+	post = Post.query.filter_by(id=post_id).first_or_404()
+	if form.validate_on_submit():
+		current_user.comment_post(post=post,body=form.body.data)
+		db.session.commit()
+		flash("Your comment is added to the post!!!")
+		return redirect(request.referrer)
+	comments = post.comments.all()
+	return render_template("comments.html",title="Comment Post",form=form,post_id=post_id,comments=comments)

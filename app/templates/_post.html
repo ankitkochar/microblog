@@ -16,6 +16,9 @@
 					{% endif %}
 						{{ post.likes.count() }} Likes
 				</td>
+				<td>
+					<a href="{{ url_for('comment',post_id=post.id) }}">Comment</a>
+				</td>
 			</tr>
 		{% endif %}
 	</table>	
