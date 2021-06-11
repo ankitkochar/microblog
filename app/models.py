@@ -113,11 +113,6 @@ class Post(db.Model):
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 	likes = db.relationship("Postlike", backref="post",lazy="dynamic")
 	comments = db.relationship("PostComment", backref="post",lazy="dynamic")
-	
-	# def get_comments(self):
-	# 	comments = PostComment.query.filter(post_id==self.id)
-	# 	return comments.order_by(Post.timestamp.desc())
-
 
 	def __repr__(self):
 		return '<Post {}>'.format(self.body)
