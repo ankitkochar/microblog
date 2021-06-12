@@ -34,14 +34,12 @@ class User(UserMixin,db.Model):
 
 	def unlike_post(self,post):
 		if self.has_liked_post(post):
-			Postlike.query.filter(
-				user_id=self.id,
-				post_id=post.id
-				).delete()
+			print("yes")
+			Postlike.query.filter(Postlike.user_id==self.id,Postlike.post_id==post.id).delete()
 
 	def uncomment_post(self,post):
 		if self.has_commented_post(post):
-			PostComment.query.filter(user_id=self.id,post_id=post_id).delete()
+			PostComment.query.filter(PostComment.user_id==self.id,PostComment.post_id==post_id).delete()
 
 	def has_liked_post(self,post):
 		return Postlike.query.filter(
