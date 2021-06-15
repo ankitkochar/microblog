@@ -11,7 +11,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config(object):
 	# ...
 	SECRET_KEY=os.environ.get("SECRET_KEY") or "ankit"
-	DATABASE_URL = "postgres://ahbyxztkbcjwpe:f6fb76ddb8d6901bfa399bade5a9aea1d118d61db965727f1be121f3597f18ec@ec2-54-145-224-156.compute-1.amazonaws.com:5432/d2uvedofabgdrn"
+	DATABASE_URL = "postgresql:///ahbyxztkbcjwpe:f6fb76ddb8d6901bfa399bade5a9aea1d118d61db965727f1be121f3597f18ec@ec2-54-145-224-156.compute-1.amazonaws.com:5432/d2uvedofabgdrn"
 	# SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'app.db')
 	# mysql://username:password@localhost/db_name
 	# pymysql+mysql://username:password@localhost/db_name
@@ -28,5 +28,5 @@ class Config(object):
 	POSTS_PER_PAGE = 3
 	LOG_TO_STDOUT = os.environ.get('LOG_TO_STDOUT')
 
-DATABASE_URL = os.environ['DATABASE_URL']
+DATABASE_URL = "postgresql:///ahbyxztkbcjwpe:f6fb76ddb8d6901bfa399bade5a9aea1d118d61db965727f1be121f3597f18ec@ec2-54-145-224-156.compute-1.amazonaws.com:5432/d2uvedofabgdrn"
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
