@@ -5,6 +5,7 @@
 # 	SECRET_KEY=os.environ.get("SECRET_KEY") or "ankit"
 
 import os
+import psycopg2
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config(object):
@@ -26,3 +27,6 @@ class Config(object):
 	ADMINS = ['ankitkochar456@gmail.com']
 	POSTS_PER_PAGE = 3
 	LOG_TO_STDOUT = os.environ.get('LOG_TO_STDOUT')
+
+DATABASE_URL = os.environ['DATABASE_URL']
+conn = psycopg2.connect(DATABASE_URL, sslmode='require')
