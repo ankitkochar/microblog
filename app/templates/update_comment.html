@@ -2,7 +2,7 @@
 
 {% block content %}
 	<div>
-		<form method="POST" action="{{ url_for('comment',post_id=post_id) }}">
+		<form method="POST" action="{{ url_for('update_comment',comment_id=comment_id) }}">
 			{{ form.hidden_tag() }}
 			<div>
 				<div>

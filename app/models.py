@@ -20,7 +20,7 @@ class User(UserMixin,db.Model):
 	posts = db.relationship('Post', backref='author', lazy='dynamic')
 	about_me = db.Column(db.String(140))
 	last_seen = db.Column(db.DateTime, default=datetime.utcnow)
-	comments = db.relationship("PostComment", foreign_keys="PostComment.user_id", backref="user",lazy="dynamic")
+	comments = db.relationship("Comment", foreign_keys="Comment.user_id", backref="user",lazy="dynamic")
 	like = db.relationship("Postlike", foreign_keys="Postlike.user_id",backref="user", lazy="dynamic")
 
 	def like_post(self,post):
@@ -29,7 +29,7 @@ class User(UserMixin,db.Model):
 			db.session.add(liked)
 
 	def comment_post(self,post,body):
-		commented = PostComment(user_id=self.id,post_id=post.id,body=body)
+		commented = Comment(user_id=self.id,post_id=post.id,body=body)
 		db.session.add(commented)
 
 	def unlike_post(self,post):
@@ -39,7 +39,7 @@ class User(UserMixin,db.Model):
 
 	def uncomment_post(self,post):
 		if self.has_commented_post(post):
-			PostComment.query.filter(PostComment.user_id==self.id,PostComment.post_id==post_id).delete()
+			Comment.query.filter(Comment.user_id==self.id,Comment.post_id==post_id).delete()
 
 	def has_liked_post(self,post):
 		return Postlike.query.filter(
@@ -47,9 +47,9 @@ class User(UserMixin,db.Model):
 			Postlike.post_id==post.id).count()>0
 
 	def has_commented_post(self,post):
-		return PostComment.query.filter(
-			PostComment.user_id==self.id,
-			PostComment.post_id==post.id).count()>0
+		return Comment.query.filter(
+			Comment.user_id==self.id,
+			Comment.post_id==post.id).count()>0
 
 	followed = db.relationship(
 		'User', secondary=followers,
@@ -110,7 +110,7 @@ class Post(db.Model):
 	timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 	likes = db.relationship("Postlike", backref="post",lazy="dynamic")
-	comments = db.relationship("PostComment", backref="post",lazy="dynamic")
+	comments = db.relationship("Comment", backref="post",lazy="dynamic")
 
 	def __repr__(self):
 		return '<Post {}>'.format(self.body)
@@ -120,7 +120,7 @@ class Postlike(db.Model):
 	user_id = db.Column(db.Integer,db.ForeignKey("user.id"))
 	post_id = db.Column(db.Integer,db.ForeignKey("post.id"))
 		
-class PostComment(db.Model):
+class Comment(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	user_id = db.Column(db.Integer,db.ForeignKey("user.id"))
 	post_id = db.Column(db.Integer,db.ForeignKey("post.id"))

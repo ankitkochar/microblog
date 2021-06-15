@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, url_for, request
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, ResetPasswordRequestForm, ResetPasswordForm, CommentForm
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User, Post
+from app.models import User, Post, Comment
 from werkzeug.urls import url_parse
 from datetime import datetime
 from app.email import send_password_reset_email
@@ -213,3 +213,47 @@ def comment(post_id):
 		return redirect(request.referrer)
 	comments = post.comments.all()
 	return render_template("comments.html",title="Comment Post",form=form,post_id=post_id,comments=comments)
+
+@app.route("/comment/<int:comment_id>/delete")
+@login_required
+def delete_comment(comment_id):
+	comment = Comment.query.filter_by(id=comment_id).first_or_404()
+	# print(comment.body)
+	db.session.delete(comment)
+	db.session.commit()
+	return redirect(request.referrer)
+
+@app.route("/comment/<int:comment_id>/update", methods=["GET","POST"])
+@login_required
+def update_comment(comment_id):
+	comment = Comment.query.filter_by(id=comment_id).first_or_404()
+	form = CommentForm()
+	if form.validate_on_submit():
+		comment.body=form.body.data
+		db.session.commit()
+		flash("Your Comment has been UPDATED")
+		return redirect(url_for("explore"))
+	return render_template("update_comment.html",title="Update Comment",form=form, comment_id=comment_id,body=comment.body)
+
+@app.route("/post/<int:post_id>/delete")
+@login_required
+def delete_post(post_id):
+	comments = Comment.query.filter_by(post_id=post_id).all()
+	post = Post.query.filter_by(id=post_id).first_or_404()
+	for comment in comments:
+		db.session.delete(comment)
+	db.session.delete(post)
+	db.session.commit()
+	return redirect(request.referrer)
+
+@app.route("/post/<int:post_id>/update",methods=["GET","POST"])
+@login_required
+def update_post(post_id):
+	post = Post.query.filter_by(id=post_id).first_or_404()
+	form = PostForm()
+	if form.validate_on_submit():
+		post.body=form.post.data
+		db.session.commit()
+		flash("Your Post is Updated")
+		return redirect(url_for("explore"))
+	return render_template("update_post.html",title="Update Post,form=form,post_id=post_id")
