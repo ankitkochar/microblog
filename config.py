@@ -11,12 +11,12 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config(object):
 	# ...
 	SECRET_KEY=os.environ.get("SECRET_KEY") or "ankit"
-	DATABASE_URL = "postgresql:///ahbyxztkbcjwpe:f6fb76ddb8d6901bfa399bade5a9aea1d118d61db965727f1be121f3597f18ec@ec2-54-145-224-156.compute-1.amazonaws.com:5432/d2uvedofabgdrn"
+	DATABASE_URL = "postgres://ahbyxztkbcjwpe:f6fb76ddb8d6901bfa399bade5a9aea1d118d61db965727f1be121f3597f18ec@ec2-54-145-224-156.compute-1.amazonaws.com:5432/d2uvedofabgdrn"
 	# SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'app.db')
 	# mysql://username:password@localhost/db_name
 	# pymysql+mysql://username:password@localhost/db_name
 	# SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or "mysql+pymysql://root:Ankit@123@localhost:3306/app"
-	SQLALCHEMY_DATABASE_URI = "postgresql://ahbyxztkbcjwpe:f6fb76ddb8d6901bfa399bade5a9aea1d118d61db965727f1be121f3597f18ec@ec2-54-145-224-156.compute-1.amazonaws.com:5432/d2uvedofabgdrn"
+	SQLALCHEMY_DATABASE_URI = "postgres://ahbyxztkbcjwpe:f6fb76ddb8d6901bfa399bade5a9aea1d118d61db965727f1be121f3597f18ec@ec2-54-145-224-156.compute-1.amazonaws.com:5432/d2uvedofabgdrn"
 	SQLALCHEMY_TRACK_MODIFICATIONS = False
 	MAIL_SERVER = os.environ.get('MAIL_SERVER') or "smtp.googlemail.com"
 	MAIL_PORT = int(os.environ.get('MAIL_PORT') or 465)
