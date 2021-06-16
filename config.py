@@ -27,6 +27,6 @@ class Config(object):
 	ADMINS = ['ankitkochar456@gmail.com']
 	POSTS_PER_PAGE = 3
 	LOG_TO_STDOUT = os.environ.get('LOG_TO_STDOUT')
-	conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+	# conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
 # DATABASE_URL = "postgresql:///ahbyxztkbcjwpe:f6fb76ddb8d6901bfa399bade5a9aea1d118d61db965727f1be121f3597f18ec@ec2-54-145-224-156.compute-1.amazonaws.com:5432/d2uvedofabgdrn"
