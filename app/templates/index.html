@@ -20,17 +20,6 @@
 
 		</form>
 	{% endif %}
-	{% if search_form %}
-		<form action="" method="post">
-			{{ search_form.hidden_tag() }}
-			<p>
-				{{search_form.tag.label}}
-				{{ search_form.tag() }}
-			</p>
-			<p>{{ search_form.submit() }}</p>
-
-		</form>
-	{% endif %}
 	{% for post in posts %}
 		{% include '_post.html' %}
 	{% endfor %}

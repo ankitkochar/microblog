@@ -12,16 +12,12 @@ from app.email import send_password_reset_email
 @login_required
 def index():
 	form = PostForm()
-	search_form = SearchPostForm()
 	if form.validate_on_submit():
 		post = Post(body=form.post.data, author=current_user, tag=form.tag.data)
 		db.session.add(post)
 		db.session.commit()
 		flash('Your post is now live!')
 		return redirect(url_for('index'))
-	if search_form.validate_on_submit():
-		posts = Post.query.filter_by(tag=form.tag.data).all()
-		return render_template("searched_post.html",posts=posts,title="Searched Post")
 	page = request.args.get("page", 1, type=int)
 	posts = current_user.followed_posts().paginate(
 		page, app.config["POSTS_PER_PAGE"], False)
@@ -31,7 +27,7 @@ def index():
 		if posts.has_prev else None
 	return render_template('index.html', title='Home', form=form,
 						   posts=posts.items, next_url=next_url,
-						   prev_url=prev_url,search_form=search_form)
+						   prev_url=prev_url)
 
 	
 @app.route('/login', methods=['GET', 'POST'])
@@ -267,15 +263,24 @@ def update_post(post_id):
 		return redirect(url_for("explore"))
 	return render_template("update_post.html",title="Update Post",form=form,post_id=post_id)
 
-# @app.route("/search/<tag_name>",methods=["GET","POST"])
-# @login_required
-# def searched_post(tag_name):
-# 	form = SearchPostForm()
-# 	if form.validate_on_submit():
-# 		posts = Post.query.filter_by(tag=form.tag.data).all()
-# 		next_url = url_for('searched_post', page=posts.next_num) \
-# 			if posts.has_next else None
-# 		prev_url = url_for('searched_post', page=posts.prev_num) \
-# 			if posts.has_prev else None
-# 		return render_template("searched_post.html",title="Searched Post",posts=posts,next_url=next_url,prev_url=prev_url)
-# 	return request.referrer
+@app.route("/search",methods=["GET","POST"])
+@login_required
+def searched_post():
+	form = SearchPostForm()
+	if form.validate_on_submit():
+		# page = request.args.get("page", 1, type=int)
+		# posts = Post.query.filter_by(tag=form.tag.data).all()
+		# page, app.config["POSTS_PER_PAGE"], False)
+		# next_url = url_for('searched_post', page=posts.next_num) \
+		# 	if posts.has_next else None
+		# prev_url = url_for('searched_post', page=posts.prev_num) \
+		# 	if posts.has_prev else None
+		return redirect(url_for("search",tag_name=form.tag.data,title="Searched Post"))
+	return render_template("search.html",title="Seach Post",form=form)
+
+@app.route("/search/<tag_name>")
+@login_required
+def search(tag_name):
+	posts = Post.query.filter_by(tag=tag_name).all()
+	form=SearchPostForm()
+	return render_template("searched_post.html",title="Searched Post",posts=posts,form=form)
