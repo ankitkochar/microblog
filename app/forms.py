@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, SelectField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
 from app.models import User
 
@@ -48,6 +48,7 @@ class EmptyForm(FlaskForm):
 class PostForm(FlaskForm):
 	post = TextAreaField('Say something', validators=[
 		DataRequired(), Length(min=1, max=140)])
+	tag = SelectField("Category",choices=[("Science","Science"),("Arts","Arts"),("Games","Games"),("Others","Others")])
 	submit = SubmitField('Submit')
 
 class ResetPasswordRequestForm(FlaskForm):
@@ -64,3 +65,6 @@ class CommentForm(FlaskForm):
 		DataRequired(), Length(min=1, max=140)])
 	submit = SubmitField('Submit')
 
+class SearchPostForm(FlaskForm):
+	tag = SelectField("Category",choices=[("Science","Science"),("Arts","Arts"),("Games","Games"),("Others","Others")])
+	submit = SubmitField('Submit')

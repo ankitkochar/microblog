@@ -108,6 +108,7 @@ class Post(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	body = db.Column(db.String(140))
 	timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+	tag = db.Column(db.String(100))
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 	likes = db.relationship("Postlike", backref="post",lazy="dynamic")
 	comments = db.relationship("Comment", backref="post",lazy="dynamic")

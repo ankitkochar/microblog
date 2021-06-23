@@ -9,6 +9,10 @@
 						{{ post.author.username }}
 					</a>
 					says:<br>{{ post.body }}<br>
+					{% if post.tag %}
+						Tag - {{ post.tag }}
+						<br>
+					{% endif %}
 					{% if current_user==post.author %}
 						<a href="{{ url_for('update_post', post_id=post.id) }}">UPDATE</a>
 						<a href="{{ url_for('delete_post', post_id=post.id) }}">DELETE</a>

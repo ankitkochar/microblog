@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, ResetPasswordRequestForm, ResetPasswordForm, CommentForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, ResetPasswordRequestForm, ResetPasswordForm, CommentForm, SearchPostForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Post, Comment
 from werkzeug.urls import url_parse
@@ -12,12 +12,16 @@ from app.email import send_password_reset_email
 @login_required
 def index():
 	form = PostForm()
+	search_form = SearchPostForm()
 	if form.validate_on_submit():
-		post = Post(body=form.post.data, author=current_user)
+		post = Post(body=form.post.data, author=current_user, tag=form.tag.data)
 		db.session.add(post)
 		db.session.commit()
 		flash('Your post is now live!')
 		return redirect(url_for('index'))
+	if search_form.validate_on_submit():
+		posts = Post.query.filter_by(tag=form.tag.data).all()
+		return render_template("searched_post.html",posts=posts,title="Searched Post")
 	page = request.args.get("page", 1, type=int)
 	posts = current_user.followed_posts().paginate(
 		page, app.config["POSTS_PER_PAGE"], False)
@@ -27,7 +31,7 @@ def index():
 		if posts.has_prev else None
 	return render_template('index.html', title='Home', form=form,
 						   posts=posts.items, next_url=next_url,
-						   prev_url=prev_url)
+						   prev_url=prev_url,search_form=search_form)
 
 	
 @app.route('/login', methods=['GET', 'POST'])
@@ -228,6 +232,7 @@ def delete_comment(comment_id):
 def update_comment(comment_id):
 	comment = Comment.query.filter_by(id=comment_id).first_or_404()
 	form = CommentForm()
+	form.body.data=comment.body
 	if form.validate_on_submit():
 		comment.body=form.body.data
 		db.session.commit()
@@ -251,9 +256,26 @@ def delete_post(post_id):
 def update_post(post_id):
 	post = Post.query.filter_by(id=post_id).first_or_404()
 	form = PostForm()
+	form.post.data=post.body
+	form.tag.data=post.tag
 	if form.validate_on_submit():
 		post.body=form.post.data
+		post.tag=form.tag.data
 		db.session.commit()
+		print(form.tag.data)
 		flash("Your Post is Updated")
 		return redirect(url_for("explore"))
-	return render_template("update_post.html",title="Update Post,form=form,post_id=post_id")
+	return render_template("update_post.html",title="Update Post",form=form,post_id=post_id)
+
+# @app.route("/search/<tag_name>",methods=["GET","POST"])
+# @login_required
+# def searched_post(tag_name):
+# 	form = SearchPostForm()
+# 	if form.validate_on_submit():
+# 		posts = Post.query.filter_by(tag=form.tag.data).all()
+# 		next_url = url_for('searched_post', page=posts.next_num) \
+# 			if posts.has_next else None
+# 		prev_url = url_for('searched_post', page=posts.prev_num) \
+# 			if posts.has_prev else None
+# 		return render_template("searched_post.html",title="Searched Post",posts=posts,next_url=next_url,prev_url=prev_url)
+# 	return request.referrer
